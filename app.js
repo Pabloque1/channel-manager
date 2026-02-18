@@ -629,12 +629,72 @@ window.handleQuickAction = (id, action) => {
     if (action === 'lock') {
         window.handleLockToggle(id);
     } else if (action === 'refresh') {
-        navigate('apartamentos');
-        alert('Datos actualizados');
+        const url = prompt("Pega aquí el enlace de tu calendario de Airbnb (iCal):");
+        if (url && url.startsWith('http')) {
+            syncAptWithAirbnb(id, url);
+        }
     } else {
         alert('Acción en desarrollo');
     }
 };
+
+async function syncAptWithAirbnb(propId, icalUrl) {
+    const prop = state.properties.find(p => p.id === propId);
+    if (!prop) return;
+
+    alert(`Sincronizando ${prop.name}... esto puede tardar unos segundos.`);
+
+    try {
+        // Usamos un proxy gratuito para evitar bloqueos de seguridad del navegador (CORS)
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(icalUrl)}`;
+        const response = await fetch(proxyUrl);
+        const data = await response.json();
+        const icalContent = data.contents;
+
+        // Limpiamos las reservas antiguas de este apartamento que venían de Airbnb
+        state.bookings = state.bookings.filter(b => !(b.propId === propId && b.channel === 'airbnb'));
+
+        // Procesador ultra-simple de iCal
+        const events = icalContent.split('BEGIN:VEVENT');
+        events.shift(); // Quitamos la cabecera
+
+        events.forEach(event => {
+            const dtstart = event.match(/DTSTART;?V?A?L?U?E?=D?A?T?E?:?(\d{8})/);
+            const dtend = event.match(/DTEND;?V?A?L?U?E?=D?A?T?E?:?(\d{8})/);
+            const summary = event.match(/SUMMARY:(.*)/);
+
+            if (dtstart && dtend) {
+                const start = dtstart[1];
+                const end = dtend[1];
+
+                // Convertimos el formato 20231012 a algo legible para la app
+                const year = start.substring(0, 4);
+                const monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+                const month = monthNames[parseInt(start.substring(4, 6)) - 1];
+                const day = start.substring(6, 8);
+
+                state.bookings.push({
+                    id: Date.now() + Math.random(),
+                    guest: summary ? summary[1].replace('Airbnb (Not available)', 'Huésped Airbnb') : 'Huésped Airbnb',
+                    propId: propId,
+                    propName: prop.name,
+                    checkin: `${day} ${month}`,
+                    checkout: `${dtend[1].substring(6, 8)} ${monthNames[parseInt(dtend[1].substring(4, 6)) - 1]}`,
+                    total: 'Sincronizado',
+                    channel: 'airbnb',
+                    status: 'Futura'
+                });
+            }
+        });
+
+        saveState();
+        alert(`¡Éxito! Hemos encontrado ${events.length} fechas ocupadas.`);
+        navigate('dashboard');
+    } catch (error) {
+        console.error(error);
+        alert("Error al conectar con Airbnb. Asegúrate de que el enlace es correcto.");
+    }
+}
 
 window.toggleTaskCompletion = (taskId) => {
     const task = state.tasks.find(t => t.id === taskId);
