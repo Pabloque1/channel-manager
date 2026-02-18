@@ -1,0 +1,17 @@
+{
+  "name": "CMPabloyElena Channel Manager",
+  "short_name": "CMPabloElena",
+  "description": "Sistema profesional de gestión de propiedades y alquiler vacacional.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3259/3259883.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

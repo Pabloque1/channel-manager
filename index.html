@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#020617">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>CMPabloyElena - Gestión Profesional</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('SW registrado'))
+                    .catch(err => console.log('Error SW', err));
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-accent">CM</span>PabloyElena
+            </div>
+            <div class="header-actions">
+                <i data-lucide="bell" class="icon"></i>
+                <div class="profile-avatar">PG</div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main id="main-content" class="fade-in">
+            <!-- Content will be injected here by app.js -->
+        </main>
+
+        <!-- Global Modal Overlay -->
+        <div id="opModalOverlay" class="modal-overlay hidden">
+            <div class="modal-content premium-card fade-in">
+                <div id="modalBody"></div>
+                <button class="btn-close-modal" onclick="closeOpModal()">Cerrar</button>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-page="dashboard">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Panel</span>
+            </button>
+            <button class="nav-item" data-page="calendario">
+                <i data-lucide="calendar"></i>
+                <span>Calendario</span>
+            </button>
+            <button class="nav-item" data-page="apartamentos">
+                <i data-lucide="home"></i>
+                <span>Apartamentos</span>
+            </button>
+            <button class="nav-item" data-page="ingresos">
+                <i data-lucide="bar-chart-3"></i>
+                <span>Ingresos</span>
+            </button>
+            <button class="nav-item" data-page="operaciones">
+                <i data-lucide="settings-2"></i>
+                <span>Operaciones</span>
+            </button>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
